@@ -1,0 +1,231 @@
+:root {
+    --kx-bg: #07070b;
+    --kx-bg-2: #101018;
+    --kx-card: #16161f;
+    --kx-line: rgba(255, 255, 255, 0.08);
+    --kx-text: #f4f4f8;
+    --kx-muted: #9a9aab;
+    --kx-pink: #ff3b6b;
+    --kx-pink-2: #ff6b8a;
+    --kx-glow: rgba(255, 59, 107, 0.35);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    min-height: 100%;
+}
+
+body.konex {
+    margin: 0;
+    background:
+        radial-gradient(1200px 500px at 10% -10%, rgba(255, 59, 107, 0.16), transparent 55%),
+        radial-gradient(900px 400px at 100% 0%, rgba(255, 59, 107, 0.08), transparent 50%),
+        var(--kx-bg);
+    color: var(--kx-text);
+    font-family: "Manrope", sans-serif;
+}
+
+a {
+    color: var(--kx-pink-2);
+    text-decoration: none;
+}
+
+a:hover {
+    color: #fff;
+}
+
+.kx-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    color: #fff;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.kx-mark {
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
+    display: grid;
+    place-items: center;
+    background: linear-gradient(135deg, var(--kx-pink), #a80d38);
+    box-shadow: 0 0 24px var(--kx-glow);
+    font-weight: 800;
+}
+
+.kx-card {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.02));
+    border: 1px solid var(--kx-line);
+    border-radius: 22px;
+    backdrop-filter: blur(12px);
+}
+
+.kx-btn {
+    border: 0;
+    border-radius: 999px;
+    padding: 0.85rem 1.2rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--kx-pink), #c81a46);
+    color: #fff;
+    box-shadow: 0 10px 30px var(--kx-glow);
+}
+
+.kx-btn:hover {
+    color: #fff;
+    filter: brightness(1.08);
+}
+
+.kx-btn-ghost {
+    background: transparent;
+    color: #fff;
+    border: 1px solid var(--kx-line);
+    box-shadow: none;
+}
+
+.kx-input,
+.kx-select,
+.kx-textarea {
+    width: 100%;
+    background: #0d0d14;
+    border: 1px solid var(--kx-line);
+    color: #fff;
+    border-radius: 14px;
+    padding: 0.85rem 1rem;
+}
+
+.kx-input:focus,
+.kx-select:focus,
+.kx-textarea:focus {
+    outline: none;
+    border-color: var(--kx-pink);
+    box-shadow: 0 0 0 3px rgba(255, 59, 107, 0.18);
+}
+
+.kx-label {
+    display: block;
+    margin-bottom: 0.4rem;
+    color: var(--kx-muted);
+    font-size: 0.82rem;
+    font-weight: 700;
+}
+
+.kx-shell {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    min-height: 100vh;
+}
+
+.kx-side {
+    border-right: 1px solid var(--kx-line);
+    padding: 1.4rem 1rem;
+    background: rgba(7, 7, 11, 0.9);
+}
+
+.kx-nav a {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    color: var(--kx-muted);
+    padding: 0.75rem 0.9rem;
+    border-radius: 14px;
+    margin-bottom: 0.35rem;
+    font-weight: 600;
+}
+
+.kx-nav a.active,
+.kx-nav a:hover {
+    background: rgba(255, 59, 107, 0.12);
+    color: #fff;
+}
+
+.kx-main {
+    padding: 1.5rem;
+}
+
+.kx-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.4rem;
+}
+
+.kx-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    border-radius: 999px;
+    padding: 0.2rem 0.7rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    background: rgba(255, 59, 107, 0.15);
+    color: var(--kx-pink-2);
+}
+
+.kx-post,
+.kx-tile {
+    padding: 1.1rem;
+}
+
+.kx-avatar {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    object-fit: cover;
+    background: #2a2a36;
+}
+
+.kx-bottom {
+    display: none;
+}
+
+@media (max-width: 900px) {
+    .kx-shell {
+        grid-template-columns: 1fr;
+    }
+
+    .kx-side {
+        display: none;
+    }
+
+    .kx-main {
+        padding: 1rem 1rem 5.5rem;
+    }
+
+    .kx-bottom {
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        display: flex;
+        justify-content: space-around;
+        padding: 0.7rem 0.4rem calc(0.7rem + env(safe-area-inset-bottom));
+        background: rgba(7, 7, 11, 0.96);
+        border-top: 1px solid var(--kx-line);
+        z-index: 20;
+    }
+
+    .kx-bottom a {
+        color: var(--kx-muted);
+        font-size: 0.72rem;
+        text-align: center;
+        font-weight: 700;
+    }
+
+    .kx-bottom a.active,
+    .kx-bottom a:hover {
+        color: var(--kx-pink-2);
+    }
+
+    .kx-bottom i {
+        display: block;
+        font-size: 1.15rem;
+        margin-bottom: 0.15rem;
+    }
+}
