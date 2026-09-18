@@ -18,7 +18,7 @@
         </div>
         <div class="mb-3 text-end">
             <strong>Tú</strong>
-            <p class="kx-card p-3 mt-1 mb-0 d-inline-block" style="background: rgba(255,59,107,.18);">Sí. Yo llevo los apuntes del semestre pasado.</p>
+            <p class="kx-card p-3 mt-1 mb-0 d-inline-block" style="background: #f8e9ed;">Sí. Yo llevo los apuntes del semestre pasado.</p>
         </div>
         <div>
             <strong>Camila Ríos</strong>

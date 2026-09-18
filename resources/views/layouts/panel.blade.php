@@ -15,8 +15,8 @@
     <div class="kx-shell">
         <aside class="kx-side">
             <a class="kx-brand mb-4" href="{{ route('inicio') }}">
-                <span class="kx-mark">K</span>
-                Konex
+                <img src="{{ asset('img/konex-mark.png') }}" alt="" class="kx-mark">
+                <span class="kx-wordmark">Konex</span>
             </a>
             <nav class="kx-nav">
                 <a href="{{ route('inicio') }}" class="{{ request()->routeIs('inicio') ? 'active' : '' }}">

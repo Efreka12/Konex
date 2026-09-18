@@ -1,13 +1,13 @@
 :root {
-    --kx-bg: #07070b;
-    --kx-bg-2: #101018;
-    --kx-card: #16161f;
-    --kx-line: rgba(255, 255, 255, 0.08);
-    --kx-text: #f4f4f8;
-    --kx-muted: #9a9aab;
-    --kx-pink: #ff3b6b;
-    --kx-pink-2: #ff6b8a;
-    --kx-glow: rgba(255, 59, 107, 0.35);
+    --kx-bg: #f7f8fb;
+    --kx-bg-2: #ffffff;
+    --kx-card: #ffffff;
+    --kx-line: #e8eaef;
+    --kx-text: #0f172a;
+    --kx-muted: #64748b;
+    --kx-pink: #6e1f35;
+    --kx-pink-2: #8d2d46;
+    --kx-glow: rgba(110, 31, 53, 0.16);
 }
 
 * {
@@ -22,48 +22,72 @@ body {
 body.konex {
     margin: 0;
     background:
-        radial-gradient(1200px 500px at 10% -10%, rgba(255, 59, 107, 0.16), transparent 55%),
-        radial-gradient(900px 400px at 100% 0%, rgba(255, 59, 107, 0.08), transparent 50%),
+        radial-gradient(1200px 500px at 10% -10%, rgba(110, 31, 53, 0.06), transparent 55%),
+        radial-gradient(900px 400px at 100% 0%, rgba(15, 23, 42, 0.04), transparent 50%),
         var(--kx-bg);
     color: var(--kx-text);
     font-family: "Manrope", sans-serif;
 }
 
 a {
-    color: var(--kx-pink-2);
+    color: var(--kx-pink);
     text-decoration: none;
 }
 
 a:hover {
-    color: #fff;
+    color: var(--kx-pink-2);
 }
 
 .kx-brand {
     display: flex;
     align-items: center;
-    gap: 0.7rem;
-    color: #fff;
+    gap: 0.75rem;
+    color: var(--kx-text);
     font-weight: 800;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.18em;
     text-transform: uppercase;
 }
 
+.kx-brand:hover {
+    color: var(--kx-text);
+}
+
 .kx-mark {
-    width: 38px;
-    height: 38px;
-    border-radius: 12px;
-    display: grid;
-    place-items: center;
-    background: linear-gradient(135deg, var(--kx-pink), #a80d38);
-    box-shadow: 0 0 24px var(--kx-glow);
+    width: 52px;
+    height: auto;
+    display: block;
+    flex-shrink: 0;
+    object-fit: contain;
+}
+
+.kx-logo {
+    width: 148px;
+    height: auto;
+    max-width: 100%;
+    object-fit: contain;
+    display: block;
+    margin: 0 auto 0.85rem;
+}
+
+.kx-wordmark {
+    margin: 0;
     font-weight: 800;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--kx-text);
+    line-height: 1;
+}
+
+h1.kx-wordmark {
+    font-size: 1.85rem;
+    margin-bottom: 0.75rem;
 }
 
 .kx-card {
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.02));
+    background: var(--kx-card);
     border: 1px solid var(--kx-line);
     border-radius: 22px;
-    backdrop-filter: blur(12px);
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.04);
 }
 
 .kx-btn {
@@ -71,9 +95,9 @@ a:hover {
     border-radius: 999px;
     padding: 0.85rem 1.2rem;
     font-weight: 700;
-    background: linear-gradient(135deg, var(--kx-pink), #c81a46);
+    background: var(--kx-pink);
     color: #fff;
-    box-shadow: 0 10px 30px var(--kx-glow);
+    box-shadow: 0 10px 24px var(--kx-glow);
 }
 
 .kx-btn:hover {
@@ -81,22 +105,43 @@ a:hover {
     filter: brightness(1.08);
 }
 
-.kx-btn-ghost {
-    background: transparent;
+a.kx-btn {
     color: #fff;
-    border: 1px solid var(--kx-line);
+}
+
+a.kx-btn:hover {
+    color: #fff;
+}
+
+.kx-btn-ghost {
+    background: #fff;
+    color: var(--kx-pink);
+    border: 1px solid var(--kx-pink);
     box-shadow: none;
+}
+
+.kx-btn-ghost:hover,
+a.kx-btn-ghost,
+a.kx-btn-ghost:hover {
+    color: var(--kx-pink);
+    background: #fff;
+    filter: none;
 }
 
 .kx-input,
 .kx-select,
 .kx-textarea {
     width: 100%;
-    background: #0d0d14;
+    background: #fff;
     border: 1px solid var(--kx-line);
-    color: #fff;
+    color: var(--kx-text);
     border-radius: 14px;
     padding: 0.85rem 1rem;
+}
+
+.kx-input::placeholder,
+.kx-textarea::placeholder {
+    color: var(--kx-muted);
 }
 
 .kx-input:focus,
@@ -104,7 +149,7 @@ a:hover {
 .kx-textarea:focus {
     outline: none;
     border-color: var(--kx-pink);
-    box-shadow: 0 0 0 3px rgba(255, 59, 107, 0.18);
+    box-shadow: 0 0 0 3px rgba(110, 31, 53, 0.12);
 }
 
 .kx-label {
@@ -113,6 +158,10 @@ a:hover {
     color: var(--kx-muted);
     font-size: 0.82rem;
     font-weight: 700;
+}
+
+.konex .text-secondary {
+    color: var(--kx-muted) !important;
 }
 
 .kx-shell {
@@ -124,7 +173,7 @@ a:hover {
 .kx-side {
     border-right: 1px solid var(--kx-line);
     padding: 1.4rem 1rem;
-    background: rgba(7, 7, 11, 0.9);
+    background: #fff;
 }
 
 .kx-nav a {
@@ -140,8 +189,8 @@ a:hover {
 
 .kx-nav a.active,
 .kx-nav a:hover {
-    background: rgba(255, 59, 107, 0.12);
-    color: #fff;
+    background: rgba(110, 31, 53, 0.08);
+    color: var(--kx-pink);
 }
 
 .kx-main {
@@ -164,8 +213,8 @@ a:hover {
     padding: 0.2rem 0.7rem;
     font-size: 0.75rem;
     font-weight: 700;
-    background: rgba(255, 59, 107, 0.15);
-    color: var(--kx-pink-2);
+    background: #f8e9ed;
+    color: var(--kx-pink);
 }
 
 .kx-post,
@@ -178,7 +227,9 @@ a:hover {
     height: 42px;
     border-radius: 50%;
     object-fit: cover;
-    background: #2a2a36;
+    background: #f8e9ed;
+    color: var(--kx-pink);
+    font-weight: 700;
 }
 
 .kx-bottom {
@@ -206,7 +257,7 @@ a:hover {
         display: flex;
         justify-content: space-around;
         padding: 0.7rem 0.4rem calc(0.7rem + env(safe-area-inset-bottom));
-        background: rgba(7, 7, 11, 0.96);
+        background: #fff;
         border-top: 1px solid var(--kx-line);
         z-index: 20;
     }
@@ -220,7 +271,7 @@ a:hover {
 
     .kx-bottom a.active,
     .kx-bottom a:hover {
-        color: var(--kx-pink-2);
+        color: var(--kx-pink);
     }
 
     .kx-bottom i {

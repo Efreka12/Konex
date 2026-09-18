@@ -6,7 +6,8 @@
 <div class="min-vh-100 d-flex align-items-center justify-content-center p-4">
     <div class="kx-card p-4 p-md-5 w-100" style="max-width: 420px;">
         <a class="kx-brand mb-4" href="{{ route('landing') }}">
-            <span class="kx-mark">K</span> Konex
+            <img src="{{ asset('img/konex-mark.png') }}" alt="" class="kx-mark">
+            <span class="kx-wordmark">Konex</span>
         </a>
         <h1 class="h3 fw-bold">Nueva contraseña</h1>
         <p class="text-secondary">Elige una clave nueva para tu cuenta Konex.</p>

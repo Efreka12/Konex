@@ -1,6 +1,6 @@
 <aside class="kx-sidebar">
     <div class="d-flex align-items-center gap-2 mb-4 px-2">
-        <div class="kx-mark mb-0" style="width:42px;height:42px;font-size:1rem;">K</div>
+        <img src="{{ asset('img/konex-mark.png') }}" alt="" class="kx-mark mb-0">
         <div>
             <div class="kx-display fw-bold">Konex</div>
             <small class="text-secondary">UNIESPINAL</small>
