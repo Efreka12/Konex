@@ -11,26 +11,32 @@
 </div>
 
 <div class="kx-card p-4" style="max-width: 640px;">
-    <form data-kx-submit data-kx-next="{{ route('recursos') }}">
+    <form method="POST" action="{{ route('recursos.store') }}">
+        @csrf
         <div class="mb-3">
             <label class="kx-label">Título</label>
-            <input class="kx-input" type="text" placeholder="Guía de algoritmos" required>
+            <input class="kx-input" name="titulo" type="text" value="{{ old('titulo') }}" placeholder="Guía de algoritmos" required>
         </div>
         <div class="mb-3">
             <label class="kx-label">Asignatura</label>
-            <select class="kx-select" required>
-                <option>Algoritmos</option>
-                <option>Bases de Datos</option>
-                <option>Cálculo II</option>
+            <select class="kx-select" name="id_asignatura" required>
+                @foreach ($asignaturas as $asignatura)
+                    <option value="{{ $asignatura->id_asignatura }}" @selected(old('id_asignatura') == $asignatura->id_asignatura)>{{ $asignatura->nombre }}</option>
+                @endforeach
+            </select>
+        </div>
+        <div class="mb-3">
+            <label class="kx-label">Tipo</label>
+            <select class="kx-select" name="tipo_archivo" required>
+                <option value="PDF">PDF</option>
+                <option value="DOC">DOC</option>
+                <option value="PPT">PPT</option>
+                <option value="IMG">IMG</option>
             </select>
         </div>
         <div class="mb-3">
             <label class="kx-label">Descripción</label>
-            <textarea class="kx-textarea" rows="4" placeholder="Qué contiene el archivo"></textarea>
-        </div>
-        <div class="mb-3">
-            <label class="kx-label">Archivo</label>
-            <input class="kx-input" type="file">
+            <textarea class="kx-textarea" name="descripcion" rows="4" placeholder="Qué contiene el archivo">{{ old('descripcion') }}</textarea>
         </div>
         <button class="kx-btn" type="submit">Publicar recurso</button>
         <a href="{{ route('recursos') }}" class="ms-3">Cancelar</a>

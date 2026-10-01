@@ -11,18 +11,19 @@
 </div>
 
 <div class="kx-card p-4" style="max-width: 640px;">
-    <form data-kx-submit data-kx-next="{{ route('perfil') }}">
+    <form method="POST" action="{{ route('perfil.store') }}">
+        @csrf
         <div class="mb-3">
             <label class="kx-label">Nombre</label>
-            <input class="kx-input" type="text" value="Ana Torres">
+            <input class="kx-input" name="nombre_completo" type="text" value="{{ old('nombre_completo', $usuario->nombre_completo) }}">
         </div>
         <div class="mb-3">
             <label class="kx-label">Programa</label>
-            <input class="kx-input" type="text" value="Ingeniería de Sistemas">
+            <input class="kx-input" type="text" value="{{ $usuario->programa->nombre ?? 'Sin programa' }}" disabled>
         </div>
         <div class="mb-3">
             <label class="kx-label">Bio</label>
-            <textarea class="kx-textarea" rows="4">Estudiante de 5.º semestre. Busco grupo para Bases de Datos.</textarea>
+            <textarea class="kx-textarea" name="bio" rows="4">{{ old('bio', $usuario->bio) }}</textarea>
         </div>
         <button class="kx-btn" type="submit">Guardar cambios</button>
         <a href="{{ route('perfil') }}" class="ms-3">Cancelar</a>

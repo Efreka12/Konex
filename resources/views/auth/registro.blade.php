@@ -12,31 +12,36 @@
         <h1 class="h3 fw-bold">Crear cuenta</h1>
         <p class="text-secondary">Únete a la red académica de UNIESPINAL.</p>
 
-        <form data-kx-submit data-kx-next="{{ route('inicio') }}">
+        @if ($errors->any())
+            <div class="alert alert-danger">{{ $errors->first() }}</div>
+        @endif
+
+        <form method="POST" action="{{ route('registro.store') }}">
+            @csrf
             <div class="mb-3">
                 <label class="kx-label">Nombre completo</label>
-                <input class="kx-input" type="text" placeholder="Ana Torres" required>
+                <input class="kx-input" name="nombre_completo" type="text" value="{{ old('nombre_completo') }}" placeholder="Ana Torres" required>
             </div>
             <div class="mb-3">
                 <label class="kx-label">Correo institucional</label>
-                <input class="kx-input" type="email" placeholder="david.c@example.com" required>
+                <input class="kx-input" name="correo_institucional" type="email" value="{{ old('correo_institucional') }}" placeholder="david.c@example.com" required>
             </div>
             <div class="mb-3">
                 <label class="kx-label">Rol</label>
-                <select class="kx-select" required>
+                <select class="kx-select" name="id_rol" required>
                     <option value="">Selecciona tu rol</option>
-                    <option>Estudiante</option>
-                    <option>Profesor</option>
-                    <option>Directivo</option>
+                    @foreach ($roles as $rol)
+                        <option value="{{ $rol->id_rol }}" @selected(old('id_rol') == $rol->id_rol)>{{ $rol->nombre }}</option>
+                    @endforeach
                 </select>
             </div>
             <div class="mb-3">
                 <label class="kx-label">Contraseña</label>
-                <input class="kx-input" type="password" required>
+                <input class="kx-input" name="contrasena" type="password" required>
             </div>
             <div class="mb-3">
                 <label class="kx-label">Confirmar contraseña</label>
-                <input class="kx-input" type="password" required>
+                <input class="kx-input" name="contrasena_confirmation" type="password" required>
             </div>
             <button class="kx-btn w-100 mb-3" type="submit">Registrarme</button>
         </form>

@@ -2,12 +2,12 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 
-class Usuario extends Model
+class Usuario extends Authenticatable
 {
     protected $table = 'usuarios';
 
@@ -34,6 +34,20 @@ class Usuario extends Model
         return [
             'created_at' => 'datetime',
         ];
+    }
+
+    public function getAuthPassword(): string
+    {
+        return $this->contrasena;
+    }
+
+    public function iniciales(): string
+    {
+        $partes = preg_split('/\s+/', trim((string) $this->nombre_completo)) ?: [];
+        $primera = mb_substr($partes[0] ?? 'K', 0, 1);
+        $segunda = mb_substr($partes[1] ?? '', 0, 1);
+
+        return mb_strtoupper($primera.$segunda);
     }
 
     public function rol(): BelongsTo
@@ -74,5 +88,10 @@ class Usuario extends Model
     public function publicaciones(): HasMany
     {
         return $this->hasMany(Publicacion::class, 'id_usuario', 'id_usuario');
+    }
+
+    public function recursos(): HasMany
+    {
+        return $this->hasMany(Recurso::class, 'id_usuario', 'id_usuario');
     }
 }

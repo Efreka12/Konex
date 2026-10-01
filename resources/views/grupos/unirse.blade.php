@@ -11,17 +11,18 @@
 </div>
 
 <div class="kx-card p-4" style="max-width: 520px;">
-    <form data-kx-submit data-kx-next="{{ route('grupos') }}">
+    <form method="POST" action="{{ route('grupos.unirse.store') }}">
+        @csrf
         <div class="mb-3">
             <label class="kx-label">Código del grupo</label>
-            <input class="kx-input" type="text" placeholder="KX-BD-204" required>
+            <input class="kx-input" name="codigo_union" type="text" value="{{ old('codigo_union') }}" placeholder="CALCII26" required>
         </div>
         <div class="mb-3">
             <label class="kx-label">Asignatura</label>
-            <select class="kx-select">
-                <option>Bases de Datos</option>
-                <option>Cálculo II</option>
-                <option>Algoritmos</option>
+            <select class="kx-select" disabled>
+                @foreach ($asignaturas as $asignatura)
+                    <option>{{ $asignatura->nombre }}</option>
+                @endforeach
             </select>
         </div>
         <button class="kx-btn" type="submit">Unirme ahora</button>

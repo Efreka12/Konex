@@ -12,14 +12,19 @@
         <h1 class="h3 fw-bold">Entrar a Konex</h1>
         <p class="text-secondary">Usa tu correo institucional de UNIESPINAL.</p>
 
-        <form data-kx-submit data-kx-next="{{ route('inicio') }}">
+        @if ($errors->any())
+            <div class="alert alert-danger">{{ $errors->first() }}</div>
+        @endif
+
+        <form method="POST" action="{{ route('login.store') }}">
+            @csrf
             <div class="mb-3">
                 <label class="kx-label">Correo</label>
-                <input class="kx-input" type="email" placeholder="david.c@example.com" required>
+                <input class="kx-input" name="correo_institucional" type="email" value="{{ old('correo_institucional') }}" placeholder="ana.torres@uniespinal.edu.co" required>
             </div>
             <div class="mb-3">
                 <label class="kx-label">Contraseña</label>
-                <input class="kx-input" type="password" placeholder="••••••••" required>
+                <input class="kx-input" name="contrasena" type="password" placeholder="••••••••" required>
             </div>
             <button class="kx-btn w-100 mb-3" type="submit">Iniciar sesión</button>
         </form>

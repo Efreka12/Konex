@@ -116,11 +116,23 @@ class KonexSeeder extends Seeder
             'rol_grupo' => 'admin',
             'fecha_union' => now(),
         ]);
+        MiembroGrupo::create([
+            'id_grupo' => $grupo->id_grupo,
+            'id_usuario' => $marta->id_usuario,
+            'rol_grupo' => 'miembro',
+            'fecha_union' => now(),
+        ]);
 
         Mensaje::create([
             'id_grupo' => $grupo->id_grupo,
             'id_usuario' => $ana->id_usuario,
             'contenido' => '¿Quedamos el jueves para repasar integrales?',
+            'fecha_envio' => now(),
+        ]);
+        Mensaje::create([
+            'id_grupo' => $grupo->id_grupo,
+            'id_usuario' => $marta->id_usuario,
+            'contenido' => 'Sí. Lleven la guía de la última clase.',
             'fecha_envio' => now(),
         ]);
 
@@ -141,6 +153,14 @@ class KonexSeeder extends Seeder
             'titulo' => 'Grupo para Bases de Datos',
             'contenido' => '¿Alguien arma grupo para el parcial de Bases de Datos? Tengo los talleres 1 al 4.',
             'fecha' => now()->subHours(2),
+        ]);
+
+        Publicacion::create([
+            'id_usuario' => $marta->id_usuario,
+            'tipo' => 'aviso',
+            'titulo' => 'Guía de Algoritmos',
+            'contenido' => 'Ya está disponible la guía de Algoritmos en Recursos, carpeta Semestre 2026-2.',
+            'fecha' => now()->subHours(5),
         ]);
 
         Comentario::create([
