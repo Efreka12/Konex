@@ -1,6 +1,6 @@
 @extends('layouts.guest')
 
-@section('title', 'Restablecer contraseña')
+@section('title', 'Nueva contraseña')
 
 @section('content')
 <div class="min-vh-100 d-flex align-items-center justify-content-center p-4">
@@ -10,16 +10,21 @@
             <span class="kx-wordmark">Konex</span>
         </a>
         <h1 class="h3 fw-bold">Nueva contraseña</h1>
-        <p class="text-secondary">Elige una clave nueva para tu cuenta Konex.</p>
+        <p class="text-secondary">Ya comprobamos que la cuenta es tuya. Elige una clave nueva. Se guarda con bcrypt.</p>
 
-        <form data-kx-submit data-kx-next="{{ route('login') }}">
+        @if ($errors->any())
+            <div class="alert alert-danger">{{ $errors->first() }}</div>
+        @endif
+
+        <form method="POST" action="{{ route('recuperar.clave.store') }}">
+            @csrf
             <div class="mb-3">
                 <label class="kx-label">Nueva contraseña</label>
-                <input class="kx-input" type="password" required>
+                <input class="kx-input" name="contrasena" type="password" minlength="8" required>
             </div>
             <div class="mb-3">
                 <label class="kx-label">Confirmar</label>
-                <input class="kx-input" type="password" required>
+                <input class="kx-input" name="contrasena_confirmation" type="password" minlength="8" required>
             </div>
             <button class="kx-btn w-100" type="submit">Guardar contraseña</button>
         </form>

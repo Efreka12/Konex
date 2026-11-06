@@ -24,4 +24,9 @@ class Programa extends Model
     {
         return $this->hasMany(Asignatura::class, 'id_programa', 'id_programa');
     }
+
+    public function getRouteKeyName(): string
+    {
+        return 'id_programa';
+    }
 }

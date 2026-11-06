@@ -73,11 +73,28 @@
             </div>
         </div>
     </div>
+    <span class="kx-chip">{{ ucfirst(str_replace('_', ' ', $publicacion->tipo)) }}</span>
+    <h2 class="h5 mt-2">{{ $publicacion->titulo }}</h2>
     <p>{{ $publicacion->contenido }}</p>
-    <div class="d-flex gap-3 text-secondary small">
-        <span><i class="bi bi-heart"></i> {{ $publicacion->reacciones_count }}</span>
+    <div class="d-flex gap-3 text-secondary small align-items-center">
+        <form method="POST" action="{{ route('publicaciones.reaccion', $publicacion) }}">
+            @csrf
+            <button class="btn btn-link p-0 text-secondary text-decoration-none" type="submit"><i class="bi bi-heart"></i> {{ $publicacion->reacciones_count }}</button>
+        </form>
         <span><i class="bi bi-chat"></i> {{ $publicacion->comentarios_count }}</span>
     </div>
+    @if ($publicacion->comentarios->isNotEmpty())
+        <div class="mt-3">
+            @foreach ($publicacion->comentarios as $comentario)
+                <p class="small mb-2"><strong>{{ $comentario->usuario->nombre_completo }}:</strong> {{ $comentario->contenido }}</p>
+            @endforeach
+        </div>
+    @endif
+    <form class="d-flex gap-2 mt-3" method="POST" action="{{ route('publicaciones.comentarios', $publicacion) }}">
+        @csrf
+        <input class="kx-input" name="contenido" maxlength="500" placeholder="Escribe un comentario" required>
+        <button class="kx-btn kx-btn-ghost" type="submit">Comentar</button>
+    </form>
 </article>
 @empty
     <div class="kx-card p-4 text-secondary">Todavía no hay publicaciones. Crea la primera.</div>

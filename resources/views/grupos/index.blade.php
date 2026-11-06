@@ -8,7 +8,12 @@
         <h1 class="h3 fw-bold mb-0">Grupos de estudio</h1>
         <p class="text-secondary mb-0">Encuentra compañeros de tu asignatura.</p>
     </div>
-    <a href="{{ route('grupos.unirse') }}" class="kx-btn">Unirse a un grupo</a>
+    <div class="d-flex gap-2 flex-wrap">
+        @if (auth()->user()->tieneRol('Docente'))
+            <a href="{{ route('grupos.crear') }}" class="kx-btn">Crear grupo</a>
+        @endif
+        <a href="{{ route('grupos.unirse') }}" class="kx-btn kx-btn-ghost">Unirse a un grupo</a>
+    </div>
 </div>
 
 <div class="row g-3">
@@ -18,7 +23,11 @@
             <span class="kx-chip">{{ $grupo->asignatura->nombre }}</span>
             <h2 class="h5 mt-3">{{ $grupo->nombre }}</h2>
             <p class="text-secondary">{{ $grupo->miembros_count }} integrantes · código {{ $grupo->codigo_union }}</p>
-            <a href="{{ route('chat', ['grupo' => $grupo->id_grupo]) }}" class="kx-btn kx-btn-ghost">Abrir chat</a>
+            @if ($gruposPropios->contains($grupo->id_grupo))
+                <a href="{{ route('chat', ['grupo' => $grupo->id_grupo]) }}" class="kx-btn kx-btn-ghost">Abrir chat</a>
+            @else
+                <span class="text-secondary small">Únete con el código para participar.</span>
+            @endif
         </div>
     </div>
     @empty

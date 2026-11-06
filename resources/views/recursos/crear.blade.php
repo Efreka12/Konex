@@ -11,7 +11,7 @@
 </div>
 
 <div class="kx-card p-4" style="max-width: 640px;">
-    <form method="POST" action="{{ route('recursos.store') }}">
+    <form method="POST" action="{{ route('recursos.store') }}" enctype="multipart/form-data">
         @csrf
         <div class="mb-3">
             <label class="kx-label">Título</label>
@@ -37,6 +37,11 @@
         <div class="mb-3">
             <label class="kx-label">Descripción</label>
             <textarea class="kx-textarea" name="descripcion" rows="4" placeholder="Qué contiene el archivo">{{ old('descripcion') }}</textarea>
+        </div>
+        <div class="mb-3">
+            <label class="kx-label">Archivo</label>
+            <input class="kx-input" name="archivo" type="file" accept=".pdf,.doc,.docx,.ppt,.pptx,.jpg,.jpeg,.png" required>
+            <div class="text-secondary small mt-1">PDF, Word, PowerPoint o imagen. Máximo 10 MB.</div>
         </div>
         <button class="kx-btn" type="submit">Publicar recurso</button>
         <a href="{{ route('recursos') }}" class="ms-3">Cancelar</a>

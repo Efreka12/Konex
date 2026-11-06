@@ -3,15 +3,20 @@
 namespace App\Http\Controllers;
 
 use App\Models\Asignatura;
+use App\Models\Comentario;
 use App\Models\Evento;
 use App\Models\GrupoEstudio;
 use App\Models\Mensaje;
 use App\Models\MiembroGrupo;
 use App\Models\Publicacion;
+use App\Models\Reaccion;
 use App\Models\Recurso;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class PageController extends Controller
 {
@@ -20,24 +25,23 @@ class PageController extends Controller
         return view('landing');
     }
 
-    public function recuperar(): View
-    {
-        return view('auth.recuperar');
-    }
-
-    public function restaurar(): View
-    {
-        return view('auth.restaurar');
-    }
-
     public function inicio(): View
     {
         return view('inicio', [
-            'grupo' => GrupoEstudio::query()->with('asignatura')->withCount('miembros')->latest('id_grupo')->first(),
-            'evento' => Evento::query()->orderBy('fecha')->first(),
-            'recurso' => Recurso::query()->with('usuario')->latest('id_recurso')->first(),
+            'grupo' => GrupoEstudio::query()
+                ->with('asignatura')
+                ->withCount('miembros')
+                ->whereHas('miembros', fn ($q) => $q->where('usuarios.id_usuario', auth()->id()))
+                ->latest('id_grupo')
+                ->first(),
+            'evento' => Evento::query()
+                ->whereHas('usuario.rol', fn ($q) => $q->where('nombre', 'Directivo'))
+                ->where('fecha', '>=', now())
+                ->orderBy('fecha')
+                ->first(),
+            'recurso' => Recurso::query()->with('usuario')->where('verificado', true)->latest('id_recurso')->first(),
             'publicaciones' => Publicacion::query()
-                ->with(['usuario.rol', 'usuario.programa'])
+                ->with(['usuario.rol', 'usuario.programa', 'comentarios.usuario'])
                 ->withCount(['comentarios', 'reacciones'])
                 ->orderByDesc('fecha')
                 ->get(),
@@ -46,13 +50,49 @@ class PageController extends Controller
 
     public function grupos(): View
     {
+        $usuario = request()->user();
+
         return view('grupos.index', [
             'grupos' => GrupoEstudio::query()
                 ->with('asignatura')
                 ->withCount('miembros')
                 ->orderBy('nombre')
                 ->get(),
+            'gruposPropios' => $usuario->grupos()->pluck('grupos_estudio.id_grupo'),
         ]);
+    }
+
+    public function crearGrupo(): View
+    {
+        return view('grupos.crear', [
+            'asignaturas' => Asignatura::query()->orderBy('nombre')->get(),
+        ]);
+    }
+
+    public function guardarGrupo(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'id_asignatura' => 'required|exists:asignaturas,id_asignatura',
+            'nombre' => 'required|string|min:3|max:120',
+            'descripcion' => 'nullable|string|max:1000',
+            'cupo' => 'required|integer|min:2|max:100',
+            'horario' => 'nullable|string|max:80',
+        ]);
+
+        $grupo = GrupoEstudio::create([
+            ...$validated,
+            'id_creador' => $request->user()->id_usuario,
+            'codigo_union' => Str::upper(Str::random(8)),
+        ]);
+
+        MiembroGrupo::create([
+            'id_grupo' => $grupo->id_grupo,
+            'id_usuario' => $request->user()->id_usuario,
+            'rol_grupo' => 'admin',
+            'fecha_union' => now(),
+        ]);
+
+        return redirect()->route('grupos')->with('ok', 'Grupo creado. Comparte el código '.$grupo->codigo_union.'.');
     }
 
     public function unirseGrupo(): View
@@ -99,11 +139,17 @@ class PageController extends Controller
 
     public function recursos(): View
     {
+        $consulta = Recurso::query()->with(['usuario', 'asignatura'])->latest('id_recurso');
+        if ($asignatura = request()->integer('asignatura')) {
+            $consulta->where('id_asignatura', $asignatura);
+        }
+        if ($tipo = request()->string('tipo')->toString()) {
+            $consulta->where('tipo_archivo', $tipo);
+        }
+
         return view('recursos.index', [
-            'recursos' => Recurso::query()
-                ->with(['usuario', 'asignatura'])
-                ->latest('id_recurso')
-                ->get(),
+            'recursos' => $consulta->get(),
+            'asignaturas' => Asignatura::query()->orderBy('nombre')->get(),
         ]);
     }
 
@@ -121,17 +167,33 @@ class PageController extends Controller
             'id_asignatura' => 'required|exists:asignaturas,id_asignatura',
             'descripcion' => 'nullable|string|max:1000',
             'tipo_archivo' => 'required|in:PDF,DOC,PPT,IMG',
+            'archivo' => 'required|file|max:10240|mimes:pdf,doc,docx,ppt,pptx,jpg,jpeg,png',
         ]);
 
+        $ruta = $request->file('archivo')->store('recursos', 'local');
+
         Recurso::create([
-            ...$validated,
+            'titulo' => $validated['titulo'],
+            'id_asignatura' => $validated['id_asignatura'],
+            'descripcion' => $validated['descripcion'] ?? null,
+            'tipo_archivo' => $validated['tipo_archivo'],
             'id_usuario' => $request->user()->id_usuario,
-            'ruta_archivo' => 'recursos/'.str()->slug($validated['titulo']).'.'.strtolower($validated['tipo_archivo']),
+            'ruta_archivo' => $ruta,
             'verificado' => $request->user()->rol?->nombre === 'Docente',
             'semestre' => '2026-2',
         ]);
 
         return redirect()->route('recursos')->with('ok', 'Recurso publicado.');
+    }
+
+    public function descargarRecurso(Request $request, Recurso $recurso): StreamedResponse
+    {
+        abort_unless(Storage::disk('local')->exists($recurso->ruta_archivo), 404, 'El archivo no está disponible.');
+
+        return Storage::disk('local')->download(
+            $recurso->ruta_archivo,
+            basename($recurso->ruta_archivo)
+        );
     }
 
     public function crearPublicacion(): View
@@ -154,6 +216,41 @@ class PageController extends Controller
         ]);
 
         return redirect()->route('inicio')->with('ok', 'Publicación creada.');
+    }
+
+    public function reaccionar(Request $request, Publicacion $publicacion): RedirectResponse
+    {
+        $reaccion = Reaccion::query()
+            ->where('id_publicacion', $publicacion->id_publicacion)
+            ->where('id_usuario', $request->user()->id_usuario)
+            ->where('tipo', 'like')
+            ->first();
+
+        $reaccion
+            ? $reaccion->delete()
+            : Reaccion::create([
+                'id_publicacion' => $publicacion->id_publicacion,
+                'id_usuario' => $request->user()->id_usuario,
+                'tipo' => 'like',
+            ]);
+
+        return back()->with('ok', $reaccion ? 'Reacción retirada.' : 'Reacción registrada.');
+    }
+
+    public function comentar(Request $request, Publicacion $publicacion): RedirectResponse
+    {
+        $validated = $request->validate([
+            'contenido' => 'required|string|min:2|max:500',
+        ]);
+
+        Comentario::create([
+            'id_publicacion' => $publicacion->id_publicacion,
+            'id_usuario' => $request->user()->id_usuario,
+            'contenido' => $validated['contenido'],
+            'fecha' => now(),
+        ]);
+
+        return back()->with('ok', 'Comentario publicado.');
     }
 
     public function chat(Request $request): View

@@ -15,5 +15,9 @@
     },
     "optionalDependencies": {
         "@laravel/multiplex": "^0.4.1"
+    },
+    "dependencies": {
+        "axios": "^1.21.0",
+        "react-router-dom": "^7.18.5"
     }
 }

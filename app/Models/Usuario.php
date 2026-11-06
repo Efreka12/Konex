@@ -6,9 +6,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Laravel\Sanctum\HasApiTokens;
 
 class Usuario extends Authenticatable
 {
+    use HasApiTokens;
+
     protected $table = 'usuarios';
 
     protected $primaryKey = 'id_usuario';
@@ -24,6 +27,7 @@ class Usuario extends Authenticatable
         'foto_perfil',
         'semestre',
         'bio',
+        'activo',
         'created_at',
     ];
 
@@ -33,6 +37,7 @@ class Usuario extends Authenticatable
     {
         return [
             'created_at' => 'datetime',
+            'activo' => 'boolean',
         ];
     }
 
@@ -48,6 +53,15 @@ class Usuario extends Authenticatable
         $segunda = mb_substr($partes[1] ?? '', 0, 1);
 
         return mb_strtoupper($primera.$segunda);
+    }
+
+    public function tieneRol(string ...$roles): bool
+    {
+        $nombre = mb_strtolower((string) $this->rol?->nombre);
+
+        return collect($roles)->contains(
+            fn (string $rol) => $nombre === mb_strtolower($rol)
+        );
     }
 
     public function rol(): BelongsTo
@@ -93,5 +107,22 @@ class Usuario extends Authenticatable
     public function recursos(): HasMany
     {
         return $this->hasMany(Recurso::class, 'id_usuario', 'id_usuario');
+    }
+
+    public function toAuthArray(): array
+    {
+        $this->loadMissing(['rol', 'programa']);
+
+        return [
+            'id' => $this->id_usuario,
+            'name' => $this->nombre_completo,
+            'email' => $this->correo_institucional,
+            'id_usuario' => $this->id_usuario,
+            'nombre_completo' => $this->nombre_completo,
+            'correo_institucional' => $this->correo_institucional,
+            'rol' => $this->rol?->nombre,
+            'programa' => $this->programa?->nombre,
+            'bio' => $this->bio,
+        ];
     }
 }

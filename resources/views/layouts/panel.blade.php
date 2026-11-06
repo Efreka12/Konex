@@ -32,6 +32,17 @@
                 <a href="{{ route('chat') }}" class="{{ request()->routeIs('chat') ? 'active' : '' }}">
                     <i class="bi bi-chat-dots"></i> Chat
                 </a>
+                <a href="{{ route('institucional') }}" class="{{ request()->routeIs('institucional*') ? 'active' : '' }}">
+                    <i class="bi bi-megaphone"></i> Institucional
+                </a>
+                @if (auth()->user()->tieneRol('Estudiante', 'Directivo'))
+                <a href="{{ route('horas.index') }}" class="{{ request()->routeIs('horas.*') ? 'active' : '' }}">
+                    <i class="bi bi-clock-history"></i> Horas sociales
+                </a>
+                @endif
+                <a href="{{ route('asistente') }}" class="{{ request()->routeIs('asistente*') ? 'active' : '' }}">
+                    <i class="bi bi-robot"></i> Asistente
+                </a>
                 <a href="{{ route('perfil') }}" class="{{ request()->routeIs('perfil*') ? 'active' : '' }}">
                     <i class="bi bi-person"></i> Perfil
                 </a>
@@ -65,6 +76,17 @@
         <a href="{{ route('chat') }}" class="{{ request()->routeIs('chat') ? 'active' : '' }}">
             <i class="bi bi-chat-dots"></i>Chat
         </a>
+        <a href="{{ route('institucional') }}" class="{{ request()->routeIs('institucional*') ? 'active' : '' }}">
+            <i class="bi bi-megaphone"></i>Info
+        </a>
+        @if (auth()->user()->tieneRol('Estudiante', 'Directivo'))
+        <a href="{{ route('horas.index') }}" class="{{ request()->routeIs('horas.*') ? 'active' : '' }}">
+            <i class="bi bi-clock-history"></i>Horas
+        </a>
+        @endif
+        <a href="{{ route('asistente') }}" class="{{ request()->routeIs('asistente*') ? 'active' : '' }}">
+            <i class="bi bi-robot"></i>Asistente
+        </a>
         <a href="{{ route('perfil') }}" class="{{ request()->routeIs('perfil*') ? 'active' : '' }}">
             <i class="bi bi-person"></i>Perfil
         </a>
@@ -72,5 +94,6 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{{ asset('js/konex.js') }}"></script>
+    @stack('scripts')
 </body>
 </html>

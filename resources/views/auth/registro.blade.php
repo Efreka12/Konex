@@ -24,7 +24,7 @@
             </div>
             <div class="mb-3">
                 <label class="kx-label">Correo institucional</label>
-                <input class="kx-input" name="correo_institucional" type="email" value="{{ old('correo_institucional') }}" placeholder="david.c@example.com" required>
+                <input class="kx-input" name="correo_institucional" type="email" value="{{ old('correo_institucional') }}" placeholder="nombre@uniespinal.edu.co" required>
             </div>
             <div class="mb-3">
                 <label class="kx-label">Rol</label>

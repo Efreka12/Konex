@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Programa;
 use App\Models\Rol;
 use App\Models\Usuario;
+use App\Services\RecoveryService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -12,6 +14,8 @@ use Illuminate\View\View;
 
 class AuthController extends Controller
 {
+    public function __construct(private RecoveryService $recovery) {}
+
     public function loginForm(): View
     {
         return view('auth.login');
@@ -28,7 +32,7 @@ class AuthController extends Controller
             ->where('correo_institucional', $validated['correo_institucional'])
             ->first();
 
-        if (! $usuario || ! Hash::check($validated['contrasena'], $usuario->contrasena)) {
+        if (! $usuario || ! $usuario->activo || ! Hash::check($validated['contrasena'], $usuario->contrasena)) {
             return back()
                 ->withInput($request->only('correo_institucional'))
                 ->withErrors(['correo_institucional' => 'Correo o contraseña incorrectos.']);
@@ -43,7 +47,7 @@ class AuthController extends Controller
     public function registroForm(): View
     {
         return view('auth.registro', [
-            'roles' => Rol::query()->orderBy('id_rol')->get(),
+            'roles' => Rol::query()->where('nombre', 'Estudiante')->get(),
         ]);
     }
 
@@ -52,18 +56,33 @@ class AuthController extends Controller
         $validated = $request->validate([
             'nombre_completo' => 'required|string|min:3|max:150',
             'correo_institucional' => 'required|email|max:150|unique:usuarios,correo_institucional',
-            'id_rol' => 'required|exists:roles,id_rol',
+            'id_rol' => [
+                'required',
+                function (string $attribute, mixed $value, \Closure $fail): void {
+                    $esEstudiante = Rol::query()
+                        ->whereKey($value)
+                        ->where('nombre', 'Estudiante')
+                        ->exists();
+                    if (! $esEstudiante) {
+                        $fail('El registro público está disponible solo para estudiantes.');
+                    }
+                },
+            ],
             'contrasena' => 'required|string|min:8|confirmed',
         ]);
 
         $usuario = Usuario::create([
             'id_rol' => $validated['id_rol'],
-            'id_programa' => \App\Models\Programa::query()->value('id_programa'),
+            'id_programa' => Programa::query()->value('id_programa'),
             'nombre_completo' => $validated['nombre_completo'],
             'correo_institucional' => $validated['correo_institucional'],
             'contrasena' => Hash::make($validated['contrasena']),
+            'activo' => true,
             'created_at' => now(),
         ]);
+
+        $this->recovery->generarCodigos($usuario, $request);
+        $this->recovery->emitirArchivo($usuario, $request);
 
         Auth::login($usuario);
         $request->session()->regenerate();

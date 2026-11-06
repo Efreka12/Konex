@@ -12,6 +12,9 @@
         <h1 class="h3 fw-bold">Entrar a Konex</h1>
         <p class="text-secondary">Usa tu correo institucional de UNIESPINAL.</p>
 
+        @if (session('ok'))
+            <div class="alert alert-success">{{ session('ok') }}</div>
+        @endif
         @if ($errors->any())
             <div class="alert alert-danger">{{ $errors->first() }}</div>
         @endif

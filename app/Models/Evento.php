@@ -26,4 +26,9 @@ class Evento extends Model
     {
         return $this->belongsTo(Usuario::class, 'id_usuario', 'id_usuario');
     }
+
+    public function getRouteKeyName(): string
+    {
+        return 'id_evento';
+    }
 }
