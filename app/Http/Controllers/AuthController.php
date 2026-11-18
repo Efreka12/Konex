@@ -47,7 +47,7 @@ class AuthController extends Controller
     public function registroForm(): View
     {
         return view('auth.registro', [
-            'roles' => Rol::query()->where('nombre', 'Estudiante')->get(),
+            'roles' => Rol::query()->orderBy('id_rol')->get(),
         ]);
     }
 
@@ -56,18 +56,7 @@ class AuthController extends Controller
         $validated = $request->validate([
             'nombre_completo' => 'required|string|min:3|max:150',
             'correo_institucional' => 'required|email|max:150|unique:usuarios,correo_institucional',
-            'id_rol' => [
-                'required',
-                function (string $attribute, mixed $value, \Closure $fail): void {
-                    $esEstudiante = Rol::query()
-                        ->whereKey($value)
-                        ->where('nombre', 'Estudiante')
-                        ->exists();
-                    if (! $esEstudiante) {
-                        $fail('El registro público está disponible solo para estudiantes.');
-                    }
-                },
-            ],
+            'id_rol' => 'required|exists:roles,id_rol',
             'contrasena' => 'required|string|min:8|confirmed',
         ]);
 
