@@ -33,7 +33,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: JSON.stringify({ pregunta: question }),
             });
             const data = await response.json();
-            addMessage(response.ok ? data.respuesta : 'No pude procesar la consulta. Revisa el texto e inténtalo de nuevo.');
+            if (!response.ok) {
+                addMessage('No pude procesar la consulta. Revisa el texto e inténtalo de nuevo.');
+                return;
+            }
+
+            const fuentes = Array.isArray(data.fuentes) ? data.fuentes.filter((fuente) => fuente.url) : [];
+            const cita = fuentes.length
+                ? `\n\nFuente: ${fuentes.map((fuente) => fuente.url).join('\n')}`
+                : '';
+            addMessage(`${data.respuesta}${cita}`);
         } catch {
             addMessage('No fue posible consultar Konex en este momento.');
         } finally {

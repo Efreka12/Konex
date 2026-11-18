@@ -97,7 +97,7 @@ class KonexClosureFlowsTest extends TestCase
         $this->assertSame($carlos->id_usuario, $solicitud->fresh()->id_directivo);
     }
 
-    public function test_asistente_responde_solo_con_datos_de_konex(): void
+    public function test_asistente_responde_con_datos_de_konex_y_de_uniespinal(): void
     {
         $ana = $this->usuario('ana.torres@uniespinal.edu.co');
 
@@ -111,10 +111,29 @@ class KonexClosureFlowsTest extends TestCase
             ->assertJsonFragment(['tipo' => 'hora_social'])
             ->assertJsonFragment(['titulo' => 'Apoyo en inducción de primer semestre']);
 
-        $this->postJson('/asistente/consultar', ['pregunta' => '¿Cuál es el precio de la matrícula?'])
+        $matricula = $this->postJson('/asistente/consultar', ['pregunta' => '¿Cuál es el precio de la matrícula?'])
+            ->assertOk()
+            ->assertJsonPath('fuentes.0.tipo', 'institucion')
+            ->assertJsonPath('fuentes.0.id', 'matricula_valores');
+        $textoMatricula = $matricula->json('respuesta');
+        $this->assertStringContainsString('1.421.176', $textoMatricula);
+        $this->assertStringContainsString('2.325.134', $textoMatricula);
+        $this->assertStringContainsString('2.468.595', $textoMatricula);
+        $this->assertStringContainsString('no coinciden', $textoMatricula);
+
+        $this->postJson('/asistente/consultar', ['pregunta' => '¿Cuál es la misión de UNIESPINAL?'])
+            ->assertOk()
+            ->assertJsonPath('fuentes.0.id', 'mision')
+            ->assertJsonPath('fuentes.0.url', 'https://uniespinal.edu.co/1-1-mision-y-vision/');
+
+        $this->postJson('/asistente/consultar', ['pregunta' => '¿Dónde queda la sede principal?'])
+            ->assertOk()
+            ->assertJsonPath('fuentes.0.id', 'sedes');
+
+        $this->postJson('/asistente/consultar', ['pregunta' => '¿Quién ganó el partido de anoche?'])
             ->assertOk()
             ->assertJsonPath('fuentes', [])
-            ->assertJsonPath('respuesta', 'No tengo ese dato en Konex. Puedo consultar eventos, noticias, recursos verificados y el estado de horas sociales.');
+            ->assertJsonPath('respuesta', 'No tengo ese dato. Puedo consultar la información oficial de UNIESPINAL (misión, visión, programas, sedes, contacto, calendario, matrícula y bienestar) y, en Konex, eventos, noticias, recursos verificados y el estado de horas sociales.');
     }
 
     public function test_buzon_solo_muestra_el_destinatario_de_la_recuperacion(): void

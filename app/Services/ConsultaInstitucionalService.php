@@ -16,15 +16,15 @@ class ConsultaInstitucionalService
     {
         $consulta = Str::of($pregunta)->lower()->ascii()->toString();
 
-        if ($this->incluye($consulta, ['evento', 'feria', 'calendario', 'actividad institucional'])) {
+        if ($this->incluye($consulta, ['evento', 'feria', 'calendario de eventos', 'actividad institucional'])) {
             return $this->eventos();
         }
 
-        if ($this->incluye($consulta, ['noticia', 'aviso', 'informacion institucional', 'novedad'])) {
+        if ($this->incluye($consulta, ['noticia', 'aviso', 'novedad'])) {
             return $this->noticias();
         }
 
-        if ($this->incluye($consulta, ['hora social', 'horas sociales', 'solicitud', 'tramite'])) {
+        if ($this->incluye($consulta, ['hora social', 'horas sociales', 'radicar horas', 'solicitud de horas'])) {
             return $this->horas($usuario);
         }
 
@@ -32,9 +32,115 @@ class ConsultaInstitucionalService
             return $this->recursos();
         }
 
+        $institucional = $this->conocimiento($consulta);
+        if ($institucional !== null) {
+            return $institucional;
+        }
+
         return $this->sinDato(
-            'No tengo ese dato en Konex. Puedo consultar eventos, noticias, recursos verificados y el estado de horas sociales.'
+            'No tengo ese dato. Puedo consultar la información oficial de UNIESPINAL (misión, visión, programas, sedes, contacto, calendario, matrícula y bienestar) y, en Konex, eventos, noticias, recursos verificados y el estado de horas sociales.'
         );
+    }
+
+    private function conocimiento(string $consulta): ?array
+    {
+        $matricula = $this->fichasDeMatricula($consulta);
+        if ($matricula->isNotEmpty()) {
+            return $this->desdeFichas($matricula);
+        }
+
+        $fichas = $this->fichasCoincidentes($consulta);
+        if ($fichas->isEmpty()) {
+            return null;
+        }
+
+        $maximo = $fichas->first()['puntos'];
+        $seleccion = $fichas
+            ->filter(fn (array $ficha) => $ficha['puntos'] >= $maximo * 0.7)
+            ->take(3)
+            ->values();
+
+        return $this->desdeFichas($seleccion);
+    }
+
+    private function fichasDeMatricula(string $consulta): Collection
+    {
+        if ($this->incluye($consulta, ['de grado', 'del grado', 'graduarme', 'graduacion', 'egresad'])) {
+            return collect();
+        }
+
+        if (! str_contains($consulta, 'matricula') && ! $this->incluye($consulta, ['precio', 'costo', 'cuesta', 'tarifa', 'pecuniario'])) {
+            return collect();
+        }
+
+        if ($this->incluye($consulta, ['beca', 'estimulo', 'gratuidad', 'descuento'])
+            && ! $this->incluye($consulta, ['precio', 'costo', 'cuesta', 'tarifa', 'cuanto'])) {
+            return $this->porIds(['estimulos']);
+        }
+
+        $dinero = $this->incluye($consulta, ['precio', 'costo', 'cuesta', 'tarifa', 'cuanto', 'pecuniario', 'valor de']);
+        $proceso = $this->incluye($consulta, ['requisito', 'como me', 'como matricular', 'renov', 'seguro', 'primera vez', 'prematricula']);
+
+        if ($dinero && ! $proceso) {
+            return $this->porIds(['matricula_valores']);
+        }
+
+        if ($proceso && ! $dinero) {
+            return $this->porIds(['matricula_proceso']);
+        }
+
+        if (str_contains($consulta, 'matricula')) {
+            return $this->porIds(['matricula_valores', 'matricula_proceso']);
+        }
+
+        return collect();
+    }
+
+    private function fichasCoincidentes(string $consulta): Collection
+    {
+        return collect(config('uniespinal.fichas'))
+            ->map(function (array $ficha) use ($consulta) {
+                $puntos = 0;
+                $coincidencias = 0;
+                foreach ($ficha['terminos'] as $termino) {
+                    if (str_contains($consulta, $termino)) {
+                        $coincidencias++;
+                        $puntos += mb_strlen($termino);
+                    }
+                }
+                if ($coincidencias > 0) {
+                    $puntos += (int) ($ficha['peso'] ?? 0);
+                }
+                $ficha['puntos'] = $puntos;
+
+                return $ficha;
+            })
+            ->filter(fn (array $ficha) => $ficha['puntos'] > 0)
+            ->sortByDesc('puntos')
+            ->values();
+    }
+
+    private function porIds(array $ids): Collection
+    {
+        $orden = array_flip($ids);
+
+        return collect(config('uniespinal.fichas'))
+            ->filter(fn (array $ficha) => isset($orden[$ficha['id']]))
+            ->sortBy(fn (array $ficha) => $orden[$ficha['id']])
+            ->values();
+    }
+
+    private function desdeFichas(Collection $fichas): array
+    {
+        return [
+            'respuesta' => $fichas->pluck('respuesta')->implode("\n\n"),
+            'fuentes' => $fichas->map(fn (array $ficha) => [
+                'tipo' => 'institucion',
+                'id' => $ficha['id'],
+                'titulo' => $ficha['titulo'],
+                'url' => $ficha['fuente'],
+            ])->values()->all(),
+        ];
     }
 
     private function eventos(): array
