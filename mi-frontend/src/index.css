@@ -151,6 +151,12 @@ button.kx-btn {
   font: inherit;
 }
 
+.kx-input::placeholder {
+  color: #b07a88;
+  font-weight: 600;
+  font-style: italic;
+}
+
 .kx-input:focus {
   outline: none;
   border-color: var(--kx-pink);

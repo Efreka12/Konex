@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { mensajeApi } from '../utils/apiError';
 
 export default function Login() {
   const { login } = useAuth();
@@ -17,23 +18,18 @@ export default function Login() {
       await login(form.email, form.password);
       navigate('/productos');
     } catch (err) {
-      const raw = err.response?.data?.message || '';
-      setError(
-        raw.includes('SQLSTATE') || raw.includes('Connection: mysql')
-          ? 'MySQL está apagado. Abre WAMP y espera a que quede en verde, luego vuelve a entrar.'
-          : (raw || 'No se pudo iniciar sesión')
-      );
+      setError(mensajeApi(err, 'No se pudo iniciar sesión'));
     }
   };
 
   return (
     <form className="kx-card kx-form" onSubmit={onSubmit}>
       <h1>Iniciar sesión</h1>
-      <p className="kx-muted">Usa una cuenta de Konex. Demo: ana.torres@uniespinal.edu.co / password</p>
+      <p className="kx-muted">Demo de la clase: ana.torres@uniespinal.edu.co / password</p>
       {error && <p className="kx-alert">{error}</p>}
       <div>
         <label className="kx-label">Correo institucional</label>
-        <input className="kx-input" name="email" type="email" value={form.email} onChange={onChange} placeholder="ana.torres@uniespinal.edu.co" required />
+        <input className="kx-input" name="email" type="email" value={form.email} onChange={onChange} placeholder="tu.correo@uniespinal.edu.co" required />
       </div>
       <div>
         <label className="kx-label">Contraseña</label>

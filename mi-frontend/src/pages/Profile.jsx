@@ -10,8 +10,6 @@ export default function Profile() {
       <p><b>ID:</b> {user.id}</p>
       <p><b>Nombre:</b> {user.name}</p>
       <p><b>Correo:</b> {user.email}</p>
-      <p><b>Rol:</b> {user.rol}</p>
-      {user.programa && <p><b>Programa:</b> {user.programa}</p>}
       <Link className="kx-btn" to="/perfil/editar">Editar perfil</Link>
     </div>
   );

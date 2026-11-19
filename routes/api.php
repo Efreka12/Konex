@@ -1,7 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AsignaturaController;
-use App\Http\Controllers\Api\AuthApiController;
+use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ComentarioController;
 use App\Http\Controllers\Api\EventoController;
 use App\Http\Controllers\Api\EventoCrudController;
@@ -17,6 +17,7 @@ use App\Http\Controllers\Api\PublicacionController;
 use App\Http\Controllers\Api\ReaccionController;
 use App\Http\Controllers\Api\RecursoController;
 use App\Http\Controllers\Api\RolController;
+use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\UsuarioAsignaturaController;
 use App\Http\Controllers\Api\UsuarioController;
 use App\Http\Controllers\TaskController;
@@ -31,13 +32,16 @@ Route::get('/user', function (Request $request) {
 
 Route::apiResource('eventos', EventoCrudController::class)->only(['index', 'show']);
 Route::apiResource('programas', ProgramaCrudController::class)->only(['index', 'show']);
-Route::apiResource('products', ProductController::class);
 
-Route::post('/auth/register', [AuthApiController::class, 'register']);
-Route::post('/auth/login', [AuthApiController::class, 'login']);
+Route::prefix('auth')->group(function () {
+    Route::post('register', [AuthController::class, 'register']);
+    Route::post('login', [AuthController::class, 'login']);
+});
+
 Route::middleware('auth:sanctum')->group(function () {
-    Route::get('/users/profile', [AuthApiController::class, 'profile']);
-    Route::put('/users/update', [AuthApiController::class, 'update']);
+    Route::get('users/profile', [UserController::class, 'profile']);
+    Route::put('users/update', [UserController::class, 'update']);
+    Route::apiResource('products', ProductController::class);
 });
 Route::middleware(['auth:sanctum', 'role:Directivo'])->group(function () {
     Route::apiResource('eventos', EventoCrudController::class)->except(['index', 'show']);

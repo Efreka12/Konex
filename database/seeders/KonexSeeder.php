@@ -16,6 +16,7 @@ use App\Models\Publicacion;
 use App\Models\Reaccion;
 use App\Models\Recurso;
 use App\Models\Rol;
+use App\Models\User;
 use App\Models\Usuario;
 use App\Models\UsuarioAsignatura;
 use Illuminate\Database\Seeder;
@@ -38,6 +39,13 @@ class KonexSeeder extends Seeder
         Programa::updateOrCreate(['nombre' => 'Administración de Empresas'], ['facultad' => 'Ciencias Económicas']);
 
         $clave = Hash::make('password');
+
+        User::updateOrCreate([
+            'email' => 'ana.torres@uniespinal.edu.co',
+        ], [
+            'name' => 'Ana Torres',
+            'password' => 'password',
+        ]);
 
         $ana = Usuario::updateOrCreate([
             'correo_institucional' => 'ana.torres@uniespinal.edu.co',
